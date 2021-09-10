@@ -22,6 +22,7 @@ func main() {
 	signal.Notify(osSign, syscall.SIGINT, syscall.SIGTERM)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.HideBanner = true
 
 	e.Use(handleRequest)
 
@@ -70,6 +71,8 @@ func handleRequest(_ echo.HandlerFunc) echo.HandlerFunc {
 			log.Println(err)
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+
+		c.Response().WriteHeader(res.StatusCode)
 		_, err = c.Response().Write(resData)
 		if err != nil {
 			log.Println(err)
