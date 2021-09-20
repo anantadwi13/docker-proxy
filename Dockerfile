@@ -6,6 +6,7 @@ RUN go mod download
 COPY cmd cmd
 COPY *.go .
 RUN go mod tidy
+RUN go test ./...
 RUN GOOS=linux CGO_ENABLED=0 go build -o service ./cmd/docker-proxy
 
 FROM alpine:3.14
@@ -14,4 +15,4 @@ COPY --from=builder /go/src/proxy/service .
 
 EXPOSE 80
 
-CMD ./service
+ENTRYPOINT ["./service"]
