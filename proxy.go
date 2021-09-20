@@ -1,4 +1,4 @@
-package proxy
+package main
 
 type Proxy interface {
 	// Start will be run as blocking function

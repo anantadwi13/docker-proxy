@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	proxy "github.com/anantadwi13/docker-proxy"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"net"
@@ -47,15 +46,15 @@ func init() {
 func main() {
 	signal.Notify(osSign, syscall.SIGINT, syscall.SIGTERM)
 
-	var p proxy.Proxy
+	var p Proxy
 
 	switch mode {
 	case "http":
 		targetHost, err := url.Parse(targetHostStr)
 		if targetHostStr == "" || err != nil {
-			p, err = proxy.NewHttpProxy(localAddrStr, nil, false)
+			p, err = NewHttpProxy(localAddrStr, nil, false)
 		} else {
-			p, err = proxy.NewHttpProxy(localAddrStr, targetHost, false)
+			p, err = NewHttpProxy(localAddrStr, targetHost, false)
 		}
 		if err != nil {
 			panic(err)
@@ -72,7 +71,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		p, err = proxy.NewTcpProxy(laddr, raddr)
+		p, err = NewTcpProxy(laddr, raddr)
 		if err != nil {
 			panic(err)
 		}
