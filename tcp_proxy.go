@@ -2,9 +2,11 @@ package proxy
 
 import (
 	"errors"
+	"fmt"
 	tcpproxy "github.com/jpillora/go-tcp-proxy"
 	"net"
 	"sync"
+	"time"
 )
 
 type tcpProxy struct {
@@ -28,6 +30,7 @@ func (t *tcpProxy) Start() error {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("listening tcp proxy on %v with remote address %v\n", t.localAddr.String(), t.remoteAddr.String())
 	for {
 		t.rwMu.RLock()
 		if t.isClosed {
@@ -54,6 +57,17 @@ func (t *tcpProxy) Shutdown() error {
 	t.isClosed = true
 	t.rwMu.Unlock()
 
-	t.wgConn.Wait()
+	done := make(chan interface{})
+
+	go func() {
+		defer close(done)
+		t.wgConn.Wait()
+	}()
+
+	select {
+	case <-time.After(10 * time.Second):
+		fmt.Println("force shutdown after waiting 10 seconds")
+	case <-done:
+	}
 	return nil
 }
